@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: triagebot
+    volumes:
+      - ./Database/CreateProspectProfilesTable.sql:/docker-entrypoint-initdb.d/init.sql
+      

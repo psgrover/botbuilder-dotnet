@@ -38,6 +38,13 @@ Once you created the LUIS model, update `appsettings.json` with your `LuisAppId`
   "LuisAPIHostName": "Your LUIS App region here (i.e: westus.api.cognitive.microsoft.com)"
 ```
 
+### TriageBot Enhancements to CoreBot
+
+- **Adaptive Dialogs**: Used Bot Framework’s Adaptive Dialogs to handle dynamic questioning based on prospect responses.
+- **State Management**: Extended `UserState` and `ConversationState` to persist `TriageSession` data.
+- **External Integrations**: Added services for CRM (e.g., PostgreSQL) and scheduling (e.g., Calendly API).
+
+
 ## To try this sample
 
 - In a terminal, navigate to `__PROJECT_NAME__`
