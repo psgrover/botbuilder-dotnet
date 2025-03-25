@@ -1,3 +1,4 @@
+using System;
 using Azure;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Configuration;
@@ -15,9 +16,10 @@ public class OpenAIService
 
     public OpenAIService(IConfiguration configuration)
     {
+        var openApiEndpoint = configuration["OpenAIEndpoint"].ToString();
         var apiKey = configuration["OpenAIApiKey"];
         _companyName = configuration["CompanyName"] ?? "our company";
-        _client = new OpenAIClient(new AzureKeyCredential(apiKey));
+        _client = new OpenAIClient(new Uri(openApiEndpoint), new AzureKeyCredential(apiKey));
     }
 
     public async Task<string> GenerateResponseAsync(string prompt, string conversationContext)

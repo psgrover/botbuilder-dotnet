@@ -21,6 +21,7 @@ public class TriageBot : DialogAndWelcomeBot<TriageRootDialog>
     public TriageBot(ConversationState conversationState, UserState userState, TriageRootDialog dialog, ILogger<DialogBot<TriageRootDialog>> logger, IConfiguration configuration)
         : base(conversationState, userState, dialog, logger)
     {
+        _configuration = configuration;
     }
 
     protected override async Task OnMembersAddedAsync(
