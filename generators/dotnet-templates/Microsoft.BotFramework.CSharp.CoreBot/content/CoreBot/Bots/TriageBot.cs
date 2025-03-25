@@ -1,25 +1,24 @@
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using CoreBot.Dialogs;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CoreBot.Dialogs;
 
 namespace CoreBot.Bots;
 
 /// <summary>
-/// This bot orchestrates the triage conversation using the `DialogAndWelcomeBot<TriageRootDialog>`.
+/// This bot orchestrates the triage conversation by extending <see cref="DialogAndWelcomeBot{T}"/> with <see cref="TriageRootDialog"/>.
 /// It leverages the welcome functionality and dialog management from the CoreBot template.
 /// </summary>
 public class TriageBot : DialogAndWelcomeBot<TriageRootDialog>
 {
     private readonly IConfiguration _configuration;
 
-    public TriageBot(ConversationState conversationState, UserState userState, TriageRootDialog dialog, 
-        ILogger<DialogBot<TriageRootDialog>> logger, IConfiguration configuration)
+    public TriageBot(ConversationState conversationState, UserState userState, TriageRootDialog dialog, ILogger<DialogBot<TriageRootDialog>> logger, IConfiguration configuration)
         : base(conversationState, userState, dialog, logger)
     {
     }

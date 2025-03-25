@@ -1,15 +1,14 @@
-using CoreBot.Models;
-using Microsoft.Extensions.Configuration;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using CoreBot.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace CoreBot.Services;
 
-public class EmailService
+public class EmailService(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-    public EmailService(IConfiguration configuration) => _configuration = configuration;
+    private readonly IConfiguration _configuration = configuration;
 
     public async Task SendNotificationAsync(ProspectProfile profile)
     {

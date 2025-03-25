@@ -1,14 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using CoreBot.Dialogs.Sections;
+using CoreBot.Models;
+using CoreBot.Services;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Extensions.Configuration;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using CoreBot.Models;
-using CoreBot.Services;
-using CoreBot.Dialogs.Sections;
-using System.Collections.Generic;
-using System;
 
 namespace CoreBot.Dialogs;
 
@@ -30,9 +30,7 @@ public class TriageRootDialog : ComponentDialog
     
     private readonly string _companyName;
 
-    public TriageRootDialog(UserState userState, CrmService crmService, EmailService emailService, 
-    IConfiguration configuration, OpenAIService openAIService, CluRecognizerService cluService, 
-    ISchedulingService schedulingService) 
+    public TriageRootDialog(UserState userState, CrmService crmService, EmailService emailService, IConfiguration configuration, OpenAIService openAIService, CluRecognizerService cluService, ISchedulingService schedulingService) 
     : base(nameof(TriageRootDialog))
     {
         _userState = userState;
@@ -59,30 +57,16 @@ public class TriageRootDialog : ComponentDialog
         AddDialog(new TextPrompt("PhoneNumberPrompt", PhoneNumberValidatorAsync));
         AddDialog(new TextPrompt("CallTimePrompt"));
 
-        AddDialog(new WaterfallDialog("TriageWaterfall", new WaterfallStep[]
-        {
-            IntroStepAsync,
-            WhyMeWhyNowStepAsync,
-            BusinessInfoStepAsync,
-            WidenGapStepAsync,
-            WhatsMissingStepAsync,
-            WhatDoYouNeedStepAsync,
-            TimingStepAsync,
-            ProblemCheckInStepAsync,
-            FitStepAsync,
-            FinalizeStepAsync,
-            PhoneCallStepAsync,
-            PhoneNumberStepAsync,
-            CallTimeStepAsync,
-            NotifyTeamStepAsync
-        }));
+        AddDialog(new WaterfallDialog(
+            "TriageWaterfall",
+            [IntroStepAsync, WhyMeWhyNowStepAsync, BusinessInfoStepAsync, WidenGapStepAsync, WhatsMissingStepAsync, WhatDoYouNeedStepAsync, TimingStepAsync, ProblemCheckInStepAsync, FitStepAsync, FinalizeStepAsync, PhoneCallStepAsync, PhoneNumberStepAsync, CallTimeStepAsync, NotifyTeamStepAsync]));
 
         InitialDialogId = "TriageWaterfall";
     }
 
     private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
-        var triageSession = await InitializeTriageSessionAsync(stepContext);
+        var triageSession = await InitializeTriageSessionAsync(stepContext, cancellationToken);
         triageSession.CurrentSection = "Intro";
         return await stepContext.BeginDialogAsync(nameof(IntroDialog), triageSession, cancellationToken);
     }
@@ -96,7 +80,7 @@ public class TriageRootDialog : ComponentDialog
 
     private async Task<DialogTurnResult> BusinessInfoStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
-        var triageSession = (TriageSession)stepContext.Result ?? (TriageSession) stepContext.Options;
+        var triageSession = (TriageSession)stepContext.Result ?? (TriageSession)stepContext.Options;
         triageSession.CurrentSection = "BusinessInfo";
         return await stepContext.BeginDialogAsync(nameof(BusinessInfoDialog), triageSession, cancellationToken);
     }
@@ -174,12 +158,13 @@ public class TriageRootDialog : ComponentDialog
 
             await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Please book a follow up meeting here: {meetingLink}"), cancellationToken);
 
-            await stepContext.PromptAsync("BookingConfirmationPrompt", 
-            new PromptOptions
-            { 
-                Prompt = MessageFactory.Text("Have you booked your follow-up meeting slot? (Yes/No)"),
-                RetryPrompt = MessageFactory.Text("Please let me know if you’ve booked the slot by answering 'Yes' or 'No'.") 
-            }, cancellationToken);
+            await stepContext.PromptAsync(
+                "BookingConfirmationPrompt", 
+                new PromptOptions
+                { 
+                    Prompt = MessageFactory.Text("Have you booked your follow-up meeting slot? (Yes/No)"),
+                    RetryPrompt = MessageFactory.Text("Please let me know if you’ve booked the slot by answering 'Yes' or 'No'.") 
+                }, cancellationToken);
         }
         else
         {
@@ -218,11 +203,13 @@ public class TriageRootDialog : ComponentDialog
             var context = $"Prospect {prospectProfile.Name} declined booking.";
             var gptResponse = await _openAIService.GenerateResponseAsync($"Ask if they’d prefer a phone call from {_companyName}.", context);
 
-            return await stepContext.PromptAsync("PhoneCallPrompt", new PromptOptions
-            {
-                Prompt = MessageFactory.Text(gptResponse),
-                RetryPrompt = MessageFactory.Text("Please say 'Yes' or 'No' to let me know if you’d like a call.")
-            }, cancellationToken);
+            return await stepContext.PromptAsync(
+                "PhoneCallPrompt", 
+                new PromptOptions
+                {
+                    Prompt = MessageFactory.Text(gptResponse),
+                    RetryPrompt = MessageFactory.Text("Please say 'Yes' or 'No' to let me know if you’d like a call.")
+                }, cancellationToken);
         }
     }
 
@@ -234,11 +221,13 @@ public class TriageRootDialog : ComponentDialog
 
         if (wantsCall)
         {
-            return await stepContext.PromptAsync("PhoneNumberPrompt", new PromptOptions
-            {
-                Prompt = MessageFactory.Text("Please provide a valid US phone number (e.g., 123-456-7890) where we can reach you."),
-                RetryPrompt = MessageFactory.Text("That doesn’t look like a valid US phone number. Please enter it in the format 123-456-7890.")
-            }, cancellationToken);
+            return await stepContext.PromptAsync(
+                "PhoneNumberPrompt", 
+                new PromptOptions
+                {
+                    Prompt = MessageFactory.Text("Please provide a valid US phone number (e.g., 123-456-7890) where we can reach you."),
+                    RetryPrompt = MessageFactory.Text("That doesn’t look like a valid US phone number. Please enter it in the format 123-456-7890.")
+                }, cancellationToken);
         }
         else
         {
@@ -260,11 +249,13 @@ public class TriageRootDialog : ComponentDialog
 
         prospectProfile.PhoneNumber = phoneNumber;
 
-        return await stepContext.PromptAsync("CallTimePrompt", new PromptOptions
-        {
-            Prompt = MessageFactory.Text("When’s the best day and time for us to call you? (e.g., 'Wednesday at 2 PM PST')"),
-            RetryPrompt = MessageFactory.Text("Please provide a specific day and time, like 'Wednesday at 2 PM PST'.")
-        }, cancellationToken);
+        return await stepContext.PromptAsync(
+            "CallTimePrompt", 
+            new PromptOptions
+            {
+                Prompt = MessageFactory.Text("When’s the best day and time for us to call you? (e.g., 'Wednesday at 2 PM PST')"),
+                RetryPrompt = MessageFactory.Text("Please provide a specific day and time, like 'Wednesday at 2 PM PST'.")
+            }, cancellationToken);
     }
 
     private async Task<DialogTurnResult> NotifyTeamStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -294,14 +285,17 @@ public class TriageRootDialog : ComponentDialog
     private async Task<bool> PhoneNumberValidatorAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
     {
         var phoneNumber = promptContext.Recognized.Value?.Trim();
-        if (string.IsNullOrEmpty(phoneNumber)) return false;
- 
+        if (string.IsNullOrEmpty(phoneNumber))
+        {
+            return false;
+        }
+
         // Validate US phone number (e.g., 123-456-7890, (123) 456-7890, or 1234567890)
         var regex = new Regex(@"^(\d{10}|\d{3}-\d{3}-\d{4}|\(\d{3}\)\s*\d{3}-\d{4})$");
         return await Task.FromResult(regex.IsMatch(phoneNumber));
     }
 
-    private async Task<TriageSession> InitializeTriageSessionAsync(WaterfallStepContext stepContext)
+    private async Task<TriageSession> InitializeTriageSessionAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         var userStateAccessors = _userState.CreateProperty<TriageSession>("TriageSession");
         return await userStateAccessors.GetAsync(stepContext.Context, () => new TriageSession(), cancellationToken);

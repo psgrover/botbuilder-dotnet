@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace CoreBot
@@ -64,6 +64,7 @@ namespace CoreBot
             services.AddSingleton<ISchedulingService, SchedulingService>();
             services.AddSingleton<OpenAIService>();
             services.AddSingleton<CluRecognizerService>();
+            services.AddHttpClient<CluRecognizerService>();
 
             // TriageBot Dialogs
             services.AddSingleton<TriageRootDialog>(sp =>
