@@ -147,7 +147,7 @@ public class TriageRootDialog : ComponentDialog
 
         if (triageSession.IsQualified)
         {
-            var summary = $"Here’s what we discussed: You’re with {prospectProfile.Company}, needing {triageSession.TempHiringType} for {prospectProfile.DesiredOutcome}, targeting {prospectProfile.Timeline}. Let’s schedule a follow-up call with all decision-makers.";
+            var summary = $"Here's what we discussed: You're with {prospectProfile.Company}, needing {triageSession.TempHiringType} for {prospectProfile.DesiredOutcome}, targeting {prospectProfile.Timeline}. Let's schedule a follow-up call with all decision-makers.";
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(summary), cancellationToken);
             
             // Use static meeting link from configuration
@@ -163,12 +163,12 @@ public class TriageRootDialog : ComponentDialog
                 new PromptOptions
                 { 
                     Prompt = MessageFactory.Text("Have you booked your follow-up meeting slot? (Yes/No)"),
-                    RetryPrompt = MessageFactory.Text("Please let me know if you’ve booked the slot by answering 'Yes' or 'No'.") 
+                    RetryPrompt = MessageFactory.Text("Please let me know if you've booked the slot by answering 'Yes' or 'No'.") 
                 }, cancellationToken);
         }
         else
         {
-            var context = $"Prospect {prospectProfile.Name} from {prospectProfile.Company} didn’t qualify.";
+            var context = $"Prospect {prospectProfile.Name} from {prospectProfile.Company} didn't qualify.";
             var gptResponse = await _openAIService.GenerateResponseAsync("Politely disqualify and suggest alternatives.", context);
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(gptResponse), cancellationToken);
         }
@@ -192,7 +192,7 @@ public class TriageRootDialog : ComponentDialog
         {
             prospectProfile.IsFollowUpBooked = true;
             prospectProfile.ConversationSummary += " Follow-up booked via link.";
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Awesome! We’ll see you at the follow-up meeting."), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Awesome! We'll see you at the follow-up meeting."), cancellationToken);
             await _crmService.SaveProspectProfileAsync(prospectProfile);
             await profileStateAccessors.SetAsync(stepContext.Context, prospectProfile, cancellationToken);
             await _userState.SaveChangesAsync(stepContext.Context, false, cancellationToken);
@@ -201,14 +201,14 @@ public class TriageRootDialog : ComponentDialog
         else
         {
             var context = $"Prospect {prospectProfile.Name} declined booking.";
-            var gptResponse = await _openAIService.GenerateResponseAsync($"Ask if they’d prefer a phone call from {_companyName}.", context);
+            var gptResponse = await _openAIService.GenerateResponseAsync($"Ask if they'd prefer a phone call from {_companyName}.", context);
 
             return await stepContext.PromptAsync(
                 "PhoneCallPrompt", 
                 new PromptOptions
                 {
                     Prompt = MessageFactory.Text(gptResponse),
-                    RetryPrompt = MessageFactory.Text("Please say 'Yes' or 'No' to let me know if you’d like a call.")
+                    RetryPrompt = MessageFactory.Text("Please say 'Yes' or 'No' to let me know if you'd like a call.")
                 }, cancellationToken);
         }
     }
@@ -226,7 +226,7 @@ public class TriageRootDialog : ComponentDialog
                 new PromptOptions
                 {
                     Prompt = MessageFactory.Text("Please provide a valid US phone number (e.g., 123-456-7890) where we can reach you."),
-                    RetryPrompt = MessageFactory.Text("That doesn’t look like a valid US phone number. Please enter it in the format 123-456-7890.")
+                    RetryPrompt = MessageFactory.Text("That doesn't look like a valid US phone number. Please enter it in the format 123-456-7890.")
                 }, cancellationToken);
         }
         else
@@ -253,7 +253,7 @@ public class TriageRootDialog : ComponentDialog
             "CallTimePrompt", 
             new PromptOptions
             {
-                Prompt = MessageFactory.Text("When’s the best day and time for us to call you? (e.g., 'Wednesday at 2 PM PST')"),
+                Prompt = MessageFactory.Text("When's the best day and time for us to call you? (e.g., 'Wednesday at 2 PM PST')"),
                 RetryPrompt = MessageFactory.Text("Please provide a specific day and time, like 'Wednesday at 2 PM PST'.")
             }, cancellationToken);
     }
@@ -268,10 +268,10 @@ public class TriageRootDialog : ComponentDialog
         prospectProfile.IsFollowUpBooked = false; // Not booked via link, but team will follow up
         prospectProfile.ConversationSummary += $" Requested a call at {callTime} to {prospectProfile.PhoneNumber}.";
 
-        var summary = $"Here’s what we discussed: You’re with {prospectProfile.Company}, needing {prospectProfile.DesiredOutcome}, and we’ll call you at {prospectProfile.PhoneNumber} on {callTime}.";
+        var summary = $"Here's what we discussed: You're with {prospectProfile.Company}, needing {prospectProfile.DesiredOutcome}, and we'll call you at {prospectProfile.PhoneNumber} on {callTime}.";
         await stepContext.Context.SendActivityAsync(MessageFactory.Text(summary), cancellationToken);
 
-        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"I’ve informed the team to reach out to you at {prospectProfile.PhoneNumber} on {callTime}."), cancellationToken);
+        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"I've informed the team to reach out to you at {prospectProfile.PhoneNumber} on {callTime}."), cancellationToken);
 
         // Team notification via email and CRM
         await _emailService.SendNotificationAsync(prospectProfile);

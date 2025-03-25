@@ -6,9 +6,19 @@ using Microsoft.Extensions.Configuration;
 
 namespace CoreBot.Services;
 
-public class EmailService(IConfiguration configuration)
+public class EmailService
 {
-    private readonly IConfiguration _configuration = configuration;
+    private readonly IConfiguration _configuration;
+
+    public EmailService()
+    {
+        // Parameterless constructor
+    }
+
+    public EmailService(IConfiguration configuration)
+    {
+        _configuration = configuration;    
+    }
 
     public async Task SendNotificationAsync(ProspectProfile profile)
     {

@@ -1,8 +1,8 @@
-using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using CoreBot.Models;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreBot.Models;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace CoreBot.Dialogs.Sections;
 
@@ -11,16 +11,12 @@ namespace CoreBot.Dialogs.Sections;
 /// </summary>
 public class IntroDialog : ComponentDialog
 {
-    public IntroDialog() : base(nameof(IntroDialog))
+    public IntroDialog() 
+    : base(nameof(IntroDialog))
     {
         AddDialog(new TextPrompt("NamePrompt"));
         AddDialog(new ConfirmPrompt("TimePrompt"));
-        AddDialog(new WaterfallDialog("IntroWaterfall", new WaterfallStep[]
-        {
-            AskNameStepAsync,
-            ConfirmTimeStepAsync,
-            ExplainCallStepAsync
-        }));
+        AddDialog(new WaterfallDialog("IntroWaterfall", new WaterfallStep[] { AskNameStepAsync, ConfirmTimeStepAsync, ExplainCallStepAsync }));
 
         InitialDialogId = "IntroWaterfall";
     }
@@ -28,7 +24,7 @@ public class IntroDialog : ComponentDialog
     private async Task<DialogTurnResult> AskNameStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         var triageSession = (TriageSession)stepContext.Options;
-        return await stepContext.PromptAsync("NamePrompt", new PromptOptions { Prompt = MessageFactory.Text("Hi! I’m from CareTechPros. What’s your name?") }, cancellationToken);
+        return await stepContext.PromptAsync("NamePrompt", new PromptOptions { Prompt = MessageFactory.Text("Hi! I'm from CareTechPros. What's your name?") }, cancellationToken);
     }
 
     private async Task<DialogTurnResult> ConfirmTimeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -44,9 +40,10 @@ public class IntroDialog : ComponentDialog
         triageSession.IsTimeConfirmed = (bool)stepContext.Result;
         if (triageSession.IsTimeConfirmed)
         {
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Great, thanks for being on time! My job today is to ask a few questions to see if we can help you. If we can, we’ll schedule another call. If not, I’ll point you in the right direction. Sound good?"), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Great, thanks for being on time! My job today is to ask a few questions to see if we can help you. If we can, we'll schedule another call. If not, I'll point you in the right direction. Sound good?"), cancellationToken);
             return await stepContext.EndDialogAsync(triageSession, cancellationToken);
         }
+
         return await stepContext.EndDialogAsync(null, cancellationToken);
     }
 }

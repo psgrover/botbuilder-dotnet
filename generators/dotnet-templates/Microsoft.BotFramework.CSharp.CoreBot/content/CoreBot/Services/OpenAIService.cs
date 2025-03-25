@@ -1,8 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using Azure;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
 
 namespace CoreBot.Services;
 
@@ -13,6 +13,11 @@ public class OpenAIService
 {
     private readonly OpenAIClient _client;
     private readonly string _companyName;
+
+    public OpenAIService()
+    {
+        // Parameterless constructor
+    }
 
     public OpenAIService(IConfiguration configuration)
     {
@@ -29,7 +34,7 @@ public class OpenAIService
             DeploymentName = "gpt-4",
             Messages =
             {
-                new ChatRequestSystemMessage($"You are TriageBot, a sales qualification bot for {_companyName}. Respond naturally and adapt to the prospect’s context."),
+                new ChatRequestSystemMessage($"You are TriageBot, a sales qualification bot for {_companyName}. Respond naturally and adapt to the prospect's context."),
                 new ChatRequestUserMessage($"{conversationContext}\n\nProspect: {prompt}")
             },
             MaxTokens = 150,

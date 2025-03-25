@@ -15,6 +15,11 @@ public class CluRecognizerService
     private readonly string _projectName;
     private readonly string _deploymentName;
 
+    public CluRecognizerService()
+    {
+        // Parameterless constructor
+    }
+
     public CluRecognizerService(IConfiguration configuration, HttpClient httpClient = null)
     {
         _endpoint = configuration["CluEndpoint"];
