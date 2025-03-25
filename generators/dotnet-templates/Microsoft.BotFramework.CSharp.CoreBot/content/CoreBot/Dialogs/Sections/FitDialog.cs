@@ -11,7 +11,8 @@ namespace CoreBot.Dialogs.Sections;
 /// </summary>
 public class FitDialog : ComponentDialog
 {
-    public FitDialog() : base(nameof(FitDialog))
+    public FitDialog() 
+    : base(nameof(FitDialog))
     {
         AddDialog(new ConfirmPrompt("FitPrompt"));
         AddDialog(new WaterfallDialog("FitWaterfall", new WaterfallStep[]
@@ -25,9 +26,7 @@ public class FitDialog : ComponentDialog
 
     private async Task<DialogTurnResult> FitStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
-        await stepContext.Context.SendActivityAsync(MessageFactory.Text(
-            "So the good news is, I’m 100% certain we can help with everything you’ve said. The best thing now is to schedule another call to talk about how. Does that sound good?"
-            ), cancellationToken);
+        await stepContext.Context.SendActivityAsync(MessageFactory.Text("So the good news is, I’m 100% certain we can help with everything you’ve said. The best thing now is to schedule another call to talk about how. Does that sound good?"), cancellationToken);
         return await stepContext.PromptAsync("FitPrompt", new PromptOptions { Prompt = MessageFactory.Text("Are you ready to move forward with scheduling that call?") }, cancellationToken);
     }
 

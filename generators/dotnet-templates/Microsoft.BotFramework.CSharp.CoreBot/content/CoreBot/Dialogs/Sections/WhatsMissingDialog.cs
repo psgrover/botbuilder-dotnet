@@ -41,6 +41,7 @@ public class WhatsMissingDialog : ComponentDialog
     private async Task<DialogTurnResult> DecisionMakersStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         var triageSession = (TriageSession)stepContext.Options;
+
         // Budget stored in ProspectProfile later
         return await stepContext.PromptAsync("DecisionMakersPrompt", new PromptOptions { Prompt = MessageFactory.Text("Other than you, who else would need to be involved in any decision to invest in a solution?") }, cancellationToken);
     }

@@ -12,6 +12,7 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CoreBot
 {
@@ -33,7 +34,6 @@ namespace CoreBot
             {
                 options.SerializerSettings.MaxDepth = HttpHelper.BotMessageSerializerSettings.MaxDepth;
             });
-
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
@@ -75,7 +75,7 @@ namespace CoreBot
                 var openAIService = sp.GetRequiredService<OpenAIService>();
                 var cluService = sp.GetRequiredService<CluRecognizerService>();
                 var schedulingService = sp.GetRequiredService<ISchedulingService>();
-                return new TriageRootDialog(userState, crmService, emailService, configuration);
+                return new TriageRootDialog(userState, crmService, emailService, configuration, openAIService, cluService, schedulingService);
             });
             services.AddSingleton<IntroDialog>();
             services.AddSingleton<WhyMeWhyNowDialog>();

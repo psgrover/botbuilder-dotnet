@@ -1,3 +1,9 @@
+using CoreBot.Models;
+using Microsoft.Extensions.Configuration;
+using System.Net;
+using System.Net.Mail;
+using System.Threading.Tasks;
+
 namespace CoreBot.Services;
 
 public class EmailService
@@ -17,7 +23,7 @@ public class EmailService
         {
             From = new MailAddress(_configuration["SmtpFromName"] ?? "bot@caretechpros.com"),
             To = { "info@caretechpros.com" },
-            Subject = $"{_configuration[SmtpSubject]}: {profile.Name}",
+            Subject = $"{_configuration["SmtpSubject"]}: {profile.Name}",
             Body = $"Prospect: {profile.Name}\nPhone: {profile.PhoneNumber}\nCall Time: {profile.PreferredCallTime}\nDetails: {profile.ConversationSummary}"
         });
     }

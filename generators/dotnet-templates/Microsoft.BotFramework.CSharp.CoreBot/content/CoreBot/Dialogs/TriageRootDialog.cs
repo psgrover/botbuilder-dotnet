@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using CoreBot.Models;
 using CoreBot.Services;
+using CoreBot.Dialogs.Sections;
+using System.Collections.Generic;
+using System;
 
 namespace CoreBot.Dialogs;
 
@@ -44,10 +47,10 @@ public class TriageRootDialog : ComponentDialog
 
         AddDialog(new IntroDialog());
         AddDialog(new WhyMeWhyNowDialog());
-        AddDialog(new BusinessInfoDialog());
+        AddDialog(new BusinessInfoDialog(_openAIService, _cluService));
         AddDialog(new WidenGapDialog());
         AddDialog(new WhatsMissingDialog());
-        AddDialog(new WhatDoYouNeedDialog());
+        AddDialog(new WhatDoYouNeedDialog(_openAIService, _cluService));
         AddDialog(new TimingDialog());
         AddDialog(new ProblemCheckInDialog());
         AddDialog(new FitDialog());
@@ -93,7 +96,7 @@ public class TriageRootDialog : ComponentDialog
 
     private async Task<DialogTurnResult> BusinessInfoStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
-        var triageSession = (TriageSession)stepContext.Result ?? (triageSession) stepContext.Options;
+        var triageSession = (TriageSession)stepContext.Result ?? (TriageSession) stepContext.Options;
         triageSession.CurrentSection = "BusinessInfo";
         return await stepContext.BeginDialogAsync(nameof(BusinessInfoDialog), triageSession, cancellationToken);
     }
@@ -217,7 +220,7 @@ public class TriageRootDialog : ComponentDialog
 
             return await stepContext.PromptAsync("PhoneCallPrompt", new PromptOptions
             {
-                Prompt = MessageFactory.Text(gptResponse)
+                Prompt = MessageFactory.Text(gptResponse),
                 RetryPrompt = MessageFactory.Text("Please say 'Yes' or 'No' to let me know if you’d like a call.")
             }, cancellationToken);
         }

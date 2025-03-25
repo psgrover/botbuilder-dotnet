@@ -3,6 +3,9 @@ using Azure.AI.TextAnalytics;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using CoreBot.Models;
 
 namespace CoreBot.Services;
 
@@ -21,30 +24,45 @@ public class CluRecognizerService
         _client = new TextAnalyticsClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
     }
 
-    public async Task<ConversationAnalysisResult> RecognizeAsync(string utterance)
+    public async Task<CluResult> RecognizeAsync(string utterance)
     {
-        var options = new AnalyzeConversationOptions
+        if (string.IsNullOrEmpty(utterance))
+            throw new ArgumentNullException(nameof(utterance));
+
+        /*var options = new AnalyzeConversationOptions
         {
             ProjectName = _projectName,
             DeploymentName = _deploymentName
+        };*/
+
+        // var response = await _client.AnalyzeConversationAsync(utterance, options);
+        var response = await _client.AnalyzeConversationAsync(utterance);
+        var result = response.Value; // AnalyzeConversationResult
+
+        return new CluResult
+        {
+            TopIntent = result.Prediction.TopIntent,
+            Entities = ExtractEntities(result.Prediction.Entities)
         };
-        var response = await _client.AnalyzeConversationAsync(utterance, options);
-        return response.Value;
+    }
+
+    private IDictionary<string, string> ExtractEntities(IReadOnlyList<CategorizedEntity> entities)
+    {
+        var entityDict = new Dictionary<string, string>();
+        foreach (var entity in entities)
+        {
+            if (!entityDict.ContainsKey(entity.Category))
+            {
+                entityDict[entity.Category] = entity.Text;
+            }
+        }
+        return entityDict;
     }
 }
 
-public class ConversationAnalysisResult
-{
-    public string TopIntent { get; }
-    public IDictionary<string, string> Entities { get; }
 
-    public ConversationAnalysisResult(AnalyzeConversationResult result)
-    {
-        TopIntent = result.Prediction.TopIntent;
-        Entities = new Dictionary<string, string>();
-        foreach (var entity in result.Prediction.Entities)
-        {
-            Entities[entity.Category] = entity.Text;
-        }
-    }
+public class CluResult
+{
+    public string TopIntent { get; set; }
+    public IDictionary<string, string> Entities { get; set; }
 }
