@@ -43,7 +43,7 @@ public class TriageRootDialog : ComponentDialog
 
         _companyName = _configuration["CompanyName"] ?? "our company";
 
-        AddDialog(new IntroDialog());
+        AddDialog(new IntroDialog(_configuration));
         AddDialog(new WhyMeWhyNowDialog());
         AddDialog(new BusinessInfoDialog(_openAIService, _cluService));
         AddDialog(new WidenGapDialog());

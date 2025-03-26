@@ -7,7 +7,6 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Adapters;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Testing;
-using Microsoft.Bot.Schema;
 using Moq;
 using Xunit;
 
@@ -40,9 +39,9 @@ namespace CoreBot.Tests
 
             // Act
             var replies = new List<string>();
-            replies.Add((await testClient.SendActivityAsync<IActivity>("AcmeCorp") as Activity).Text); // Company
-            replies.Add((await testClient.SendActivityAsync<IActivity>("50") as Activity).Text); // TeamSize
-            replies.Add((await testClient.SendActivityAsync<IActivity>("contractors") as Activity).Text); // HiringType
+            replies.Add((await testClient.SendActivityAsync<string>("AcmeCorp")).Text); // Company
+            replies.Add((await testClient.SendActivityAsync<string>("50")).Text); // TeamSize
+            replies.Add((await testClient.SendActivityAsync<string>("contractors")).Text); // HiringType
 
             // Assert
             Assert.Contains("How many employees are currently at AcmeCorp?", replies);

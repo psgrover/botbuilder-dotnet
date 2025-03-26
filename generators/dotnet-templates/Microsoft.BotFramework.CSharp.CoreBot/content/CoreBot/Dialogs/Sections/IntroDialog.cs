@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CoreBot.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Extensions.Configuration;
 
 namespace CoreBot.Dialogs.Sections;
 
@@ -11,9 +12,13 @@ namespace CoreBot.Dialogs.Sections;
 /// </summary>
 public class IntroDialog : ComponentDialog
 {
-    public IntroDialog() 
+    private IConfiguration _configuration;
+
+    public IntroDialog(IConfiguration configuration) 
     : base(nameof(IntroDialog))
     {
+        _configuration = configuration;
+
         AddDialog(new TextPrompt("NamePrompt"));
         AddDialog(new ConfirmPrompt("TimePrompt"));
         AddDialog(new WaterfallDialog("IntroWaterfall", new WaterfallStep[] { AskNameStepAsync, ConfirmTimeStepAsync, ExplainCallStepAsync }));
@@ -24,7 +29,8 @@ public class IntroDialog : ComponentDialog
     private async Task<DialogTurnResult> AskNameStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
     {
         var triageSession = (TriageSession)stepContext.Options;
-        return await stepContext.PromptAsync("NamePrompt", new PromptOptions { Prompt = MessageFactory.Text("Hi! I'm from CareTechPros. What's your name?") }, cancellationToken);
+        var welcomeMessage = _configuration["WelcomeMessage"] ?? "Hi! I'm TriageBot. What's your name?";
+        return await stepContext.PromptAsync("NamePrompt", new PromptOptions { Prompt = MessageFactory.Text(welcomeMessage) }, cancellationToken);
     }
 
     private async Task<DialogTurnResult> ConfirmTimeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
